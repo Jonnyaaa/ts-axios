@@ -17,7 +17,11 @@ module.exports = {
   entry: fs.readdirSync(__dirname).reduce((entries, dir) => {
     const fullDir = path.join(__dirname, dir)
     const entry = path.join(fullDir, 'app.ts')
+    // 判断 fullDir 是否是一个目录（排除文件）
+    // 判断 app.ts 文件是否存在（避免没有 app.ts 的子目录被当作 entry）
     if (fs.statSync(fullDir).isDirectory() && fs.existsSync(entry)) {
+      // 把入口设为数组 —— 表示该 entry 包含两个模块：webpack-hot-middleware/client（HMR 客户端脚本）和所写的 app.ts
+      // webpack 会把这两个模块都打包进最终的 bundle，这样页面加载 bundle 后 HMR 功能就可用
       entries[dir] = ['webpack-hot-middleware/client', entry]
     }
 
