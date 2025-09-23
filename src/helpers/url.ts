@@ -1,4 +1,4 @@
-import { isDate, isObject } from './util'
+import { isDate, isPlainObject } from './util'
 
 // 对 URL 参数做编码处理
 function encode(val: string): string {
@@ -50,7 +50,7 @@ export function buildURL(url: string, params?: any): string {
     values.forEach(val => {
       if (isDate(val)) {
         val = val.toISOString() // 如果值是 Date，转成 ISO 字符串（2025-09-17T13:30:00.000Z）
-      } else if (isObject(val)) {
+      } else if (isPlainObject(val)) {
         val = JSON.stringify(val) // 如果是普通对象（{a:1}），转成 JSON（{"a":1}）
       }
       parts.push(`${encode(key)}=${encode(val)}`)
