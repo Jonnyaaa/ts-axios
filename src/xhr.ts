@@ -1,5 +1,7 @@
 import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from './types'
 
+import { parseHeaders } from './helpers/headers'
+
 export default function xhr(config: AxiosRequestConfig): AxiosPromise {
   // 返回一个 Promise，类型是 AxiosPromise
   return new Promise(resolve => {
@@ -22,8 +24,8 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
         return
       }
 
-      // getAllResponseHeaders() 拿到原始响应头（字符串形式）
-      const responseHeaders = request.getAllResponseHeaders()
+      // getAllResponseHeaders() 拿到原始响应头（字符串形式），再使用parseHeaders解析成对象
+      const responseHeaders = parseHeaders(request.getAllResponseHeaders())
       // 根据 responseType 决定返回 response 还是 responseText
       const responseData = responseType !== 'text' ? request.response : request.responseText
 

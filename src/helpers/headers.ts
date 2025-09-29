@@ -37,3 +37,30 @@ export function processHeaders(headers: any, data: any): any {
 
   return headers
 }
+
+export function parseHeaders(headers: string): any {
+  let parsed = Object.create(null)
+  // 如果没有响应头字符串，直接返回空对象
+  if (!headers) {
+    return parsed
+  }
+
+  // 响应头用 \r\n 分隔
+  headers.split('\r\n').forEach(line => {
+    // 按 ":" 切分成 key 和 value，比如 "Content-Type: application/json"
+    let [key, val] = line.split(':')
+    // 去掉 key 两端的空格，并转成小写，保证大小写不敏感
+    key = key.trim().toLowerCase()
+    // 如果 key 为空（可能是无效行），直接跳过
+    if (!key) {
+      return
+    }
+    // 如果有 value，去掉两端空格
+    if (val) {
+      val = val.trim()
+    }
+    parsed[key] = val
+  })
+
+  return parsed
+}

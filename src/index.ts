@@ -1,14 +1,17 @@
 import { buildURL } from './helpers/url'
-import { AxiosRequestConfig, AxiosPromise } from './types'
+import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from './types'
 import xhr from './xhr'
-import { transformRequest } from './helpers/data'
+import { transformRequest, transformResponse } from './helpers/data'
 import { processHeaders } from './helpers/headers'
 
 function axios(config: AxiosRequestConfig): AxiosPromise {
   // 拼接 URL 参数
   processConfig(config)
-  return xhr(config)
-  // 返回 AxiosPromise，这样外部可以用 then 拿到响应对象
+  // 发送请求，xhr 返回 AxiosPromise（Promise<AxiosResponse>）
+  return xhr(config).then(res => {
+    // 对响应数据做一层转换，再返回
+    return transformResponseData(res)
+  })
 }
 
 // 处理请求配置函数
@@ -33,6 +36,12 @@ function transformRequestData(config: AxiosRequestConfig): any {
 function transformHeaders(config: AxiosRequestConfig): any {
   const { headers = {}, data } = config // config.headers 可能未传，设置默认值 {}
   return processHeaders(headers, data)
+}
+
+// 处理响应数据函数
+function transformResponseData(res: AxiosResponse): AxiosResponse {
+  res.data = transformResponse(res.data)
+  return res
 }
 
 export default axios
