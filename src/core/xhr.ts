@@ -1,7 +1,7 @@
-import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from './types'
+import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from '../types'
 
-import { parseHeaders } from './helpers/headers'
-import { createError } from './helpers/error'
+import { parseHeaders } from '../helpers/headers'
+import { createError } from '../helpers/error'
 
 export default function xhr(config: AxiosRequestConfig): AxiosPromise {
   // 返回一个 Promise，类型是 AxiosPromise
@@ -19,7 +19,7 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
       request.timeout = timeout
     }
 
-    request.open(method.toUpperCase(), url, true) // 初始化请求
+    request.open(method.toUpperCase(), url!, true) // 初始化请求
 
     // 监听请求状态变化
     // onreadystatechange 在请求状态变化时触发

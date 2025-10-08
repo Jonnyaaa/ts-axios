@@ -12,3 +12,12 @@ export function isDate(val: any): val is Date {
 export function isPlainObject(val: any): val is Object {
   return toString.call(val) === '[object Object]'
 }
+
+// 合并两个对象的属性
+export function extend<T, U>(to: T, from: U): T & U {
+  for (const key in from) {
+    ;(to as T & U)[key] = from[key] as any
+    // 分号 ;：独立表达式开头的分号，用于避免代码压缩或拼接时可能出现的语法歧义
+  }
+  return to as T & U
+}
