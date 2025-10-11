@@ -21,3 +21,27 @@ export function extend<T, U>(to: T, from: U): T & U {
   }
   return to as T & U
 }
+
+// 深度合并多个对象
+export function deepMerge(...objs: any[]): any {
+  const result = Object.create(null)
+
+  objs.forEach(obj => {
+    if (obj) {
+      Object.keys(obj).forEach(key => {
+        const val = obj[key]
+        if (isPlainObject(val)) {
+          // 如果result[key]已经是一个对象，也就是说，如果多个对象的同一个key对应的值都是对象，就会递归合并
+          if (isPlainObject(result[key])) {
+            result[key] = deepMerge(result[key], val)
+          } else {
+            result[key] = deepMerge(val)
+          }
+        } else {
+          result[key] = val
+        }
+      })
+    }
+  })
+  return result
+}

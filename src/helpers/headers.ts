@@ -1,4 +1,4 @@
-import { isPlainObject } from './util'
+import { deepMerge, isPlainObject } from './util'
 
 /**
  * 规范化请求头字段名（大小写统一）
@@ -63,4 +63,21 @@ export function parseHeaders(headers: string): any {
   })
 
   return parsed
+}
+
+// 扁平化请求头
+export function flattenHeaders(headers: any, method: string): any {
+  if (!headers) {
+    return headers
+  }
+
+  headers = deepMerge(headers.common, headers[method], headers)
+
+  const methodsToDelete = ['delete', 'get', 'head', 'options', 'post', 'put', 'patch', 'common']
+
+  methodsToDelete.forEach(method => {
+    delete headers[method]
+  })
+
+  return headers
 }

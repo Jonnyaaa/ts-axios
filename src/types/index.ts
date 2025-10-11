@@ -22,6 +22,9 @@ export interface AxiosRequestConfig {
   headers?: any
   responseType?: XMLHttpRequestResponseType
   timeout?: number
+
+  // 允许添加其他任意属性，字符串索引签名
+  [propName: string]: any
 }
 
 export interface AxiosResponse<T = any> {
@@ -44,6 +47,7 @@ export interface AxiosError extends Error {
 }
 
 export interface Axios {
+  defaults: AxiosRequestConfig
   interceptors: {
     request: AxiosInterceptorManager<AxiosRequestConfig>
     response: AxiosInterceptorManager<AxiosResponse>
