@@ -1,5 +1,10 @@
 import { isDate, isPlainObject } from './util'
 
+interface URLOrigin {
+  protocol: string
+  host: string
+}
+
 // 对 URL 参数做编码处理
 function encode(val: string): string {
   return (
@@ -70,4 +75,30 @@ export function buildURL(url: string, params?: any): string {
     url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams // 如果原始 URL 已经有参数，用 & 拼接，否则用 ? 拼接
   }
   return url
+}
+
+// 判断给定的请求 URL 是否与当前页面同源（即协议和主机名相同）
+export function isURLSameOrigin(requestURL: string): boolean {
+  const parsedOrigin = resolveURL(requestURL)
+  return (
+    parsedOrigin.protocol === currentOrigin.protocol && parsedOrigin.host === currentOrigin.host
+  )
+}
+
+// 创建一个 <a> 标签节点，用来解析 URL
+// 浏览器原生的 <a> 元素在设置 href 后，会自动解析出 protocol、host 等字段
+const urlParsingNode = document.createElement('a')
+// 获取当前页面的源信息（协议 + 主机）:比如当前页面是 http://localhost:8080/index.html，那么 currentOrigin = { protocol: 'http:', host: 'localhost:8080' }
+const currentOrigin = resolveURL(window.location.href)
+
+function resolveURL(url: string): URLOrigin {
+  // 把传入的 url 设置为这个 <a> 标签的 href 属性值
+  urlParsingNode.setAttribute('href', url)
+  // 获取协议+主机
+  const { protocol, host } = urlParsingNode
+
+  return {
+    protocol,
+    host
+  }
 }
