@@ -13,6 +13,12 @@ export function isPlainObject(val: any): val is Object {
   return toString.call(val) === '[object Object]'
 }
 
+// 判断是否为FormData
+// 判断 typeof val !== 'undefined' 是为了避免在 val 未定义时，直接使用 val instanceof FormData 抛出错误
+export function isFormData(val: any): val is FormData {
+  return typeof val !== 'undefined' && val instanceof FormData
+}
+
 // 合并两个对象的属性
 export function extend<T, U>(to: T, from: U): T & U {
   for (const key in from) {
