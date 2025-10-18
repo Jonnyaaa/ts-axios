@@ -133,6 +133,7 @@
     "webpack-hot-middleware": "^2.24.3"
   },
   "dependencies": {
+    "atob": "^2.1.2",
     "cookie-parser": "^1.4.7"
   }
 }
