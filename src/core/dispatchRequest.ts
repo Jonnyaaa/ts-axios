@@ -1,5 +1,5 @@
 // 用于统一处理请求配置并发送真正的 HTTP 请求，是 Axios 请求流程的核心桥梁
-import { buildURL } from '../helpers/url'
+import { buildURL, isAbsoluteURL, combineURL } from '../helpers/url'
 import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from '../types'
 import xhr from './xhr'
 import { flattenHeaders } from '../helpers/headers'
@@ -26,7 +26,10 @@ function processConfig(config: AxiosRequestConfig): void {
 
 // URL 转换函数
 function transformURL(config: AxiosRequestConfig): string {
-  const { url, params, paramsSerializer } = config
+  let { url, params, paramsSerializer, baseURL } = config
+  if (baseURL && !isAbsoluteURL(url!)) {
+    url = combineURL(baseURL, url)
+  }
   return buildURL(url!, params, paramsSerializer)
 }
 

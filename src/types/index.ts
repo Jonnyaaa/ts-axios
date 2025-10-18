@@ -33,6 +33,7 @@ export interface AxiosRequestConfig {
   auth?: AxiosBasicCredentials
   validateStatus?: (status: number) => boolean
   paramsSerializer?: (params: any) => string
+  baseURL?: string
 
   // 允许添加其他任意属性，字符串索引签名
   [propName: string]: any

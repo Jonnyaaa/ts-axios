@@ -90,6 +90,17 @@ export function buildURL(
   return url
 }
 
+// 判断 URL 是否为绝对路径
+export function isAbsoluteURL(url: string): boolean {
+  return /(^[a-z][a-z\d\+\-\.]*:)?\/\//i.test(url)
+}
+
+// 拼接 baseURL 与相对路径
+export function combineURL(baseURL: string, relativeURL?: string): string {
+  // 移除 baseURL 末尾的所有斜杠,移除相对路径开头的所有斜杠
+  return relativeURL ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '') : baseURL
+}
+
 // 判断给定的请求 URL 是否与当前页面同源（即协议和主机名相同）
 export function isURLSameOrigin(requestURL: string): boolean {
   const parsedOrigin = resolveURL(requestURL)
