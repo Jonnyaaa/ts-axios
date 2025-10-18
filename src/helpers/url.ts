@@ -1,4 +1,4 @@
-import { isDate, isPlainObject } from './util'
+import { isDate, isPlainObject, isURLSearchParams } from './util'
 
 interface URLOrigin {
   protocol: string
@@ -21,50 +21,63 @@ function encode(val: string): string {
   // 只带g，表示全局替换，带i+g，表示忽略大小写，全局替换
 }
 
-export function buildURL(url: string, params?: any): string {
+export function buildURL(
+  url: string,
+  params?: any,
+  paramsSerializer?: (params: any) => string
+): string {
   // 如果 params 没传，直接返回原始 url
   if (!params) {
     return url
   }
 
-  //parts 用来存储最终的 key=value 字符串片段
-  const parts: string[] = []
+  let serializedParams
 
-  // 把 params 的所有 key 取出来，遍历执行一次回调函数
-  Object.keys(params).forEach(key => {
-    // Object.keys(params):返回 params 自身可枚举属性的 键名数组
-    const val = params[key] // 取出 key 对应的值
-    // 跳过 null 和 undefined 的参数，不放进 URL
+  // 自定义规则优先于默认规则，特殊类型优先于普通对象
+  if (paramsSerializer) {
+    serializedParams = paramsSerializer(params)
+  } else if (isURLSearchParams(params)) {
+    serializedParams = params.toString()
+  } else {
+    //parts 用来存储最终的 key=value 字符串片段
+    const parts: string[] = []
 
-    if (val === null || typeof val === 'undefined') {
-      return
-      // 只会结束当前这一次回调函数的执行，相当于 continue 的效果,forEach 不能用 return 或 break 来彻底中断循环
-    }
+    // 把 params 的所有 key 取出来，遍历执行一次回调函数
+    Object.keys(params).forEach(key => {
+      // Object.keys(params):返回 params 自身可枚举属性的 键名数组
+      const val = params[key] // 取出 key 对应的值
+      // 跳过 null 和 undefined 的参数，不放进 URL
 
-    let values = []
-    // 如果参数是数组 → 例如 tags: ['js', 'ts'] 会变成：tags[] = js & tags[]=ts。
-    if (Array.isArray(val)) {
-      values = val
-      key += '[]'
-    } else {
-      // 如果不是数组 → 包装成单元素数组，统一处理
-      values = [val]
-    }
-
-    // 处理每一个值
-    values.forEach(val => {
-      if (isDate(val)) {
-        val = val.toISOString() // 如果值是 Date，转成 ISO 字符串（2025-09-17T13:30:00.000Z）
-      } else if (isPlainObject(val)) {
-        val = JSON.stringify(val) // 如果是普通对象（{a:1}），转成 JSON（{"a":1}）
+      if (val === null || typeof val === 'undefined') {
+        return
+        // 只会结束当前这一次回调函数的执行，相当于 continue 的效果,forEach 不能用 return 或 break 来彻底中断循环
       }
-      parts.push(`${encode(key)}=${encode(val)}`)
-    })
-  })
 
-  // 合并参数：把 parts 数组拼接成 a=1&b=2 这种格式
-  // join把数组中的所有元素用指定的分隔符连接成一个字符串
-  let serializedParams = parts.join('&')
+      let values = []
+      // 如果参数是数组 → 例如 tags: ['js', 'ts'] 会变成：tags[] = js & tags[]=ts。
+      if (Array.isArray(val)) {
+        values = val
+        key += '[]'
+      } else {
+        // 如果不是数组 → 包装成单元素数组，统一处理
+        values = [val]
+      }
+
+      // 处理每一个值
+      values.forEach(val => {
+        if (isDate(val)) {
+          val = val.toISOString() // 如果值是 Date，转成 ISO 字符串（2025-09-17T13:30:00.000Z）
+        } else if (isPlainObject(val)) {
+          val = JSON.stringify(val) // 如果是普通对象（{a:1}），转成 JSON（{"a":1}）
+        }
+        parts.push(`${encode(key)}=${encode(val)}`)
+      })
+    })
+
+    // 合并参数：把 parts 数组拼接成 a=1&b=2 这种格式
+    // join把数组中的所有元素用指定的分隔符连接成一个字符串
+    serializedParams = parts.join('&')
+  }
 
   if (serializedParams) {
     const markIndex = url.indexOf('#') // 找到 # 的位置
